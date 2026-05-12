@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "pyjxzgz",
+  "name": "zgz",
   "compatibility_date": "2026-05-12",
   "observability": {
     "enabled": true
