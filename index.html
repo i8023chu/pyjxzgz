@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>平舆驾校-资格证远程教育平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+            line-height: 1.5;
+        }
+
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #122b4a);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-top: 0.25rem;
+        }
+
+        .course-tabs {
+            background: white;
+            border-radius: 1rem;
+            padding: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .course-tab {
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: #f1f5f9;
+            color: #334155;
+            transition: all 0.2s;
+            border: none;
+        }
+        .course-tab.active {
+            background: #1e3c72;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .course-tab:hover:not(.active) {
+            background: #e2e8f0;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .playlist-panel {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            max-height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .playlist-header {
+            background: #f8fafc;
+            padding: 0.8rem 1.2rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .video-count {
+            background: #e2e8f0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: normal;
+            color: #334155;
+        }
+        .search-box {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 2rem;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .search-box input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+        }
+
+        .list-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+
+        .module-group {
+            border-bottom: 1px solid #eef2ff;
+        }
+        .module-title {
+            background: #f1f5f9;
+            padding: 0.7rem 1.2rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #0c4a6e;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #3b82f6;
+        }
+        .module-title:hover {
+            background: #e6edf5;
+        }
+        .module-title .arrow {
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+        .module-title.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        .chapter-list {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .chapter-list.collapsed {
+            max-height: 0 !important;
+        }
+        .chapter-item {
+            padding: 0.5rem 1rem 0.5rem 2rem;
+            font-size: 0.85rem;
+            border-left: 2px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            background: white;
+        }
+        .chapter-item:hover {
+            background: #eff6ff;
+            border-left-color: #3b82f6;
+        }
+        .chapter-item.active {
+            background: #dbeafe;
+            border-left-color: #2563eb;
+            font-weight: 500;
+        }
+        .video-badge {
+            font-size: 0.7rem;
+            background: #cbd5e1;
+            border-radius: 20px;
+            padding: 0.1rem 0.45rem;
+            white-space: nowrap;
+        }
+        .video-title {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .player-panel {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            position: sticky;
+            top: 1rem;
+        }
+        .video-wrapper {
+            background: #000;
+            aspect-ratio: 16 / 9;
+            width: 100%;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #0f0f0f;
+        }
+        .player-info {
+            padding: 1rem 1.2rem;
+            background: white;
+            border-top: 1px solid #eef2ff;
+        }
+        .current-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: #0f172a;
+        }
+        .current-chapter {
+            font-size: 0.75rem;
+            color: #475569;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .playlist-panel {
+                max-height: 450px;
+            }
+            .player-panel {
+                position: static;
+            }
+            .header h1 {
+                font-size: 1.3rem;
+            }
+        }
+
+        .list-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #64748b;
+            padding: 1rem 0;
+            border-top: 1px solid #e2e8f0;
+        }
+        button {
+            background: none;
+            border: none;
+        }
+        .expand-all {
+            background: #eef2ff;
+            border-radius: 20px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <h1>📚 平舆驾校从业资格继续教育-远程学习平台</h1>
+        <p>默认折叠所有视频，请自行展开，选择自己对应的课程播放视频进行学习</p>
+    </div>
+
+    <div class="course-tabs" id="courseTabs">
+        <button class="course-tab" data-course="driver">🚛 危险品驾驶员</button>
+        <button class="course-tab" data-course="escort">📦 危险品押运员</button>
+        <button class="course-tab" data-course="passenger">🚌 客运驾驶员</button>
+        <button class="course-tab" data-course="taxi">🚕 出租车/网约车驾驶员</button>
+    </div>
+
+    <div class="main-grid">
+        <div class="playlist-panel">
+            <div class="playlist-header">
+                <span>📚 课程目录</span>
+                <span class="video-count" id="videoCount">0个视频</span>
+                <div>
+                    <button class="expand-all" id="expandAllBtn">📂 全部展开</button>
+                    <button class="expand-all" id="collapseAllBtn" style="margin-left:6px;">📁 全部收起</button>
+                </div>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 搜索课程标题..." autocomplete="off">
+            </div>
+            <div class="list-scroll" id="listContainer">
+                <div style="padding: 2rem; text-align: center;">加载中...</div>
+            </div>
+        </div>
+
+        <div class="player-panel">
+            <div class="video-wrapper">
+                <video id="mainVideo" controls preload="metadata"></video>
+            </div>
+            <div class="player-info">
+                <div class="current-title" id="currentTitle">🎬 请从左侧选择课程</div>
+                <div class="current-chapter" id="currentChapter"></div>
+            </div>
+        </div>
+    </div>
+    <footer>📞 联系电话-03963371678 平舆县机动车驾驶培训学校</footer>
+</div>
+
+<script>
+    // ======================= 课程数据 =======================
+    const coursesData = {
+        // ---------- 危险品驾驶员 ----------
+        driver: [
+            { module: "模块一 基础知识", chapter: "第一章 职业道德和劳动保护", title: "职业道德和劳动保护 1", url: "https://txv3.aaej.cn/a49e69d0456671ee80014531949c0102/00d21ed784ff46b5ae404dfa3fb01ab2-0ceec75918c8b0e0e8c25758b6c2fab7-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第一章 职业道德和劳动保护", title: "职业道德和劳动保护 2", url: "https://txv3.aaej.cn/a4a3c100456671eeb0414531959c0102/9a8842d6e919492abb44c91f8a80e8b0-2cf79276c6ae81207f3938cf29354e83-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第一章 职业道德和劳动保护", title: "职业道德和劳动保护 3", url: "https://txv3.aaej.cn/a4a372e0456671ee80030674a2ce0102/82a85b7b42474668845352b0b40f9f4c-388d34d6880d5ed1175d967731b8b311-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第一章 职业道德和劳动保护", title: "职业道德和劳动保护 4", url: "https://txv3.aaej.cn/a4a0dad0456671eebfb44531959d0102/5e1ce114d0924effadd637d26f96a3d2-07a0b0e5fe43087fcdd1e29c39ea38ef-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第二章 法律法规", title: "法律法规 1", url: "https://txv3.aaej.cn/a4a1ec40456671eebffd0764b3ec0102/290336d624a3471684df4e46aa8303ca-4ef57897129b325e5b6f20defc4884df-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第二章 法律法规", title: "法律法规 2", url: "https://txv3.aaej.cn/d8e98f30456671eebfb44531959d0102/fcc727997982493b8fa99848150a3dae-2a2ca623672f21776d4c5665d1abce53-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第二章 法律法规", title: "法律法规 3", url: "https://txv3.aaej.cn/920ee8b0456871ee91670764a0ec0102/9681198dbd864abaa446ed443194f382-f80e76989577df098c147ed731580de3-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第二章 法律法规", title: "法律法规 4", url: "https://txv3.aaej.cn/93035ad0456871eebfaf5420848d0102/812233e2409640d786aea548380d84c4-cda95acabc28213e0476e4507b4fc08e-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 1", url: "https://txv3.aaej.cn/95240600456a71ee80030674a2ce0102/57f834f9a75a4fe999e0f5f97a89a512-bacad8b9d84ab0ca81dfae26704b7071-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 2", url: "https://txv3.aaej.cn/952390d0456a71eebffd5107e0c90102/d25d2828993348a49ab91e5a89eeb59b-c62b57e8fb9b72fcb3f868e7dfe206d2-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 3", url: "https://txv3.aaej.cn/95247b30456a71ee80030674a2ce0102/093b160f31f74d39b91cba8e350968eb-c4bc1624d0c57b39b886cd38c76614c3-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 4", url: "https://txv3.aaej.cn/98ef05d0456c71eebf9f0764a0fd0102/4014db7dc90441c1802cb82b5e4a7181-d9d089382d6036d7395d46efe58a5116-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 5", url: "https://txv3.aaej.cn/d1402310456c71eebf925420848c0102/92ef59664d3d42e9a9eb80c6f241989a-1227a1522517982435914d5bfabfbe67-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第四章 品名及运输索引", title: "品名及运输索引 1", url: "https://txv3.aaej.cn/f23ab6b0456d71eebfa76723b78e0102/3c24077bcf3348158dd8f8fa2c197063-70ef48033a9d2bfcf31f866c1d9d46ff-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第四章 品名及运输索引", title: "品名及运输索引 2", url: "https://txv3.aaej.cn/930333c0456871ee81055017e1f90102/88b94a78a19b4c3199713261c1b57e47-6d6657692ba35de285524ca8a99b94b8-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第四章 品名及运输索引", title: "品名及运输索引 3", url: "https://txv3.aaej.cn/92ff3c20456871eebf886733a68f0102/ff90ccaaa2e64b3fbf452a633304b89e-63a669699434c84bec5940212cb082d7-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第五章 包装常识", title: "包装常识 1", url: "https://txv3.aaej.cn/f23deb00456d71ee80014531949c0102/f8b979f5e2cc46f6b60de614be1e2867-e0f4d167d7b363503f303d4faf4fe2d6-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第五章 包装常识", title: "包装常识 2", url: "https://txv3.aaej.cn/f2503a80456d71eebf9a4531858c0102/33bee992c50c4e509d6ab136b5dc6038-3501f0e54e5e88e046c83eb7198ab03f-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第五章 包装常识", title: "包装常识 3", url: "https://txv3.aaej.cn/f250d6c0456d71ee80030674a2ce0102/fd6f6a10294240788bbb4b37e6fc6272-c4d285bf6524e25d7ce8950788872227-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第五章 包装常识", title: "包装常识 4", url: "https://txv3.aaej.cn/92fa3310456871eeb8177035d0b20102/48acaa83d49f4f04bc4d663a6a2c9d8d-5c0cbe9105e1d2941c48626be63cb806-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第六章 托运要求", title: "托运要求 1", url: "https://txv3.aaej.cn/4fdec530456f71eead1c4531948c0102/f70e4528a95245fabff63d1600699a80-c8b46a45895f70c4e2bd419c60d462c7-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第六章 托运要求", title: "托运要求 2", url: "https://txv3.aaej.cn/4fca2bc0456f71eebffd0764b3ec0102/00f700618f9b4ee6b07d22205c839fb7-7e62674567023139e69c470a67b058c8-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第六章 托运要求", title: "托运要求 3", url: "https://txv3.aaej.cn/4fdb1bb0456f71ee912d5017f1e80102/e5bfdf0942f6439bb707e39d61a61e1d-42dbbfb36f6031a00ba69eb1068bb8cd-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第七章 装卸", title: "装卸 1", url: "https://txv3.aaej.cn/3ba47510458371ee81075017e1f90102/882607ed21e84330af4fd69a7886c71a-e4ba69332482001114ad1d5140c99b5d-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第七章 装卸", title: "装卸 2", url: "https://txv3.aaej.cn/3baf98a0458371eeb8187035d0b20102/7c32d41b100a4ba7a40571808d2d75aa-409ef0ca6153cdd191c53c98f3aeb236-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第七章 装卸", title: "装卸 3", url: "https://txv3.aaej.cn/3ba363a0458371eebd706723a78f0102/650e4f16f3cf4e74bab224552ae33f5c-1199fcb81bbe86f8dddccddb6701840b-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 1", url: "https://txv3.aaej.cn/95220a30456a71eebfd56733a78e0102/6311aa4e559b4064b3edfb7d52a572e1-60942e7ec18579b10892a4e008380918-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 2", url: "https://txv3.aaej.cn/95253e80456a71ee81464531958c0102/b7217b49452348a58f094319c50e82d4-ea76e0d2b84362e6f51bf012ea5c48aa-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 3", url: "https://txv3.aaej.cn/15d3a9a0457471ee91670764a0ec0102/4eda22c791b54891bf014608e6907975-68be50d3281aff30ee5663b76df0f93a-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 4", url: "https://txv3.aaej.cn/16bde290457471eeb0414531959c0102/2cf2384747564b81b9b5b7503b8bfc29-47f99ec11bf9cc07f4373dc23dc33e9a-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 5", url: "https://txv3.aaej.cn/16bfb750457471ee80890764a3fd0102/d0e1ede1a9dd4c94aedb0aa51dab7977-b018e691f01533d37ea7f35935ddc06a-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 1", url: "https://txv3.aaej.cn/4fde28f0456f71eebfaf5420848d0102/5816b3236c0540a780b2488f69c16357-d88aaa99f4e56958e8fca2b025c27942-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 2", url: "https://txv3.aaej.cn/4fdb42c0456f71ee92266732b68f0102/8cf9c1ed1c014d5092eddb42812200b6-ace74d9ed926ac5c16d8c12a08bda348-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 3", url: "https://txv3.aaej.cn/0a258be0457f71ee91670764a0ec0102/414809ae33ae4312ba259719462ec4e7-68dfce360397a7966716cd7493ac4e26-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 4", url: "https://txv3.aaej.cn/1a28c000458171ee91670764a0ec0102/70b0d56a11934dcfb6675349a621754e-aba16f3c78dd31c212ddac3dd6a15e27-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 5", url: "https://txv3.aaej.cn/85086040460a71eebfd45017f1f80102/295837a0dc3543f7bacec384b860af7a-c2eb501a8cb660b57ea95a1163bdd779-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第十章 事故案例", title: "事故案例 1", url: "https://txv3.aaej.cn/9244b1d0458071eebf9b4531858c0102/fdfd5ba9e72c4b80ba114ade81bb57bf-7ac64b52e56be8ccc2d888684874d397-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第十章 事故案例", title: "事故案例 2", url: "https://txv3.aaej.cn/54717210458271eebd706723a78f0102/a6e8dc17fc674386b2b722308d09053c-7d1df2ac0aafe167bcb297f51ef949f5-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第十章 事故案例", title: "事故案例 3", url: "https://txv3.aaej.cn/548659a0458271ee81075017e1f90102/054a1da245dd41099730a60c8250a184-a0e0bcedc6946df04735e2cd95790d70-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第十章 事故案例", title: "事故案例 4", url: "https://txv3.aaej.cn/12058e90460c71eead204531948c0102/c59257eb3ed344c999e54e17b41fb51d-a38c704e6daf3f4bca574b47a1acc893-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第一章 车辆专用设备", title: "车辆专用设备 1", url: "https://txv3.aaej.cn/e1ff7710457571eebfd35017f1f80102/8dc7c05abf524d9cb96c9bbfb69db9f2-7b652d662aac66eb24d2f499d3862d31-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第一章 车辆专用设备", title: "车辆专用设备 2", url: "https://txv3.aaej.cn/e1fedad0457571eead1d4531948c0102/2d1a843a4be043a99aee637fcb17211d-55e4f0e088a332a5f5a75bd2c097b284-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第一章 车辆专用设备", title: "车辆专用设备 3", url: "https://txv3.aaej.cn/e2059190457571ee80014531949c0102/86a56f64978b420eb2af048614f8172e-705689f270d0c45123f687b7a4ca0e5d-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第二章 罐式运输操作", title: "罐式运输操作 1", url: "https://txv3.aaej.cn/16c116e0457471ee81464531958c0102/0f728c99102d4b7ea40b30c63780802c-654934df65155392e48fd14ae1f76511-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第二章 罐式运输操作", title: "罐式运输操作 2", url: "https://txv3.aaej.cn/50bd9a30457471ee8e875017f0f80102/43d43baff93c4628a32ea327f06903ca-03b12b860971cb299049d8895b5a0d42-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第三章 标志标记", title: "标志标记 1", url: "https://txv3.aaej.cn/fd654dc0457c71ee8e875017f0f80102/9c15e533c4b8449bb44acfac8ee797a9-322c2f248f0dac6772a1a446134c7bd6-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第三章 标志标记", title: "标志标记 2", url: "https://txv3.aaej.cn/fd5f5a50457c71eebfd35017f1f80102/fb254376e0e3493eaf77a1fd73efbda2-a860a53e21b4f63a700f9794f46180e3-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第四章 运输单证", title: "运输单证 1", url: "https://txv3.aaej.cn/fd707150457c71ee800c5017f0e80102/58802b6e5fb94a9b95f666d6e708452e-75cc579dc0f69829f4f8250061e06ba7-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第四章 运输单证", title: "运输单证 2", url: "https://txv3.aaej.cn/cdb43c30457771ee80014531949c0102/b537eb0bc9654897942c454dfeacf142-ecb933b5be34376c09eafa5ac733116f-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第五章 道路通行", title: "道路通行 1", url: "https://txv3.aaej.cn/f78fb840457771eebfa85017f1e90102/e2bc1556e42d4d4eba5ce3d3f36ed962-ccb0a8a547f275bda5ca102a2409f32a-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第五章 道路通行", title: "道路通行 2", url: "https://txv3.aaej.cn/365d63f0457e71eebffd0764b3ec0102/52a4028bef5e42c79084e8f5d305aad1-5f9a92985524699fc94681facfe98c44-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第六章 出车检查", title: "出车检查 1", url: "https://txv3.aaej.cn/365f86d0457e71ee80030674a2ce0102/47441c83e50e4e44afa21cff2ffff7fd-5e7ec4f66f53912321279e42f2104664-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第六章 出车检查", title: "出车检查 2", url: "https://txv3.aaej.cn/366be2e0457e71eebffd0764b3ec0102/55ba4eea4a704d449fd21d4004c47906-bed50cebe796d0f2a82656c990f5b2f4-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第七章 现场前期处置", title: "现场前期处置 1", url: "https://txv3.aaej.cn/366d9090457e71eebfd56733a78e0102/48017f9ed38d4a38a6d11e4562bb6e3d-fb8b39f254bf136b3fe16509e7ecb168-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第七章 现场前期处置", title: "现场前期处置 2", url: "https://txv3.aaej.cn/0b07d590457f71eebfce5017f0f90102/a06fbfb87a444e6c806bf8b1cdd3db70-de4f415584567204018651001fdb7983-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第八章 防护用品穿戴", title: "防护用品穿戴 1", url: "https://txv3.aaej.cn/0b0898e0457f71eebf925420848c0102/f8aeed2c56c7436ebc78b439cb2c7d0d-207e3dad64008350b806ee97ddaf01cf-fd.mp4" },
+            { module: "模块二 驾驶专业知识", chapter: "第八章 防护用品穿戴", title: "防护用品穿戴 2", url: "https://txv3.aaej.cn/92443ca0458071eeb61a4531859c0102/f13746e93bb84c878d7d40236a8e4e93-aa7d9cf4e52103fdb76269a2e09fd0e2-fd.mp4" }
+        ],
+
+        // ---------- 危险品押运员 ----------
+        escort: [
+            { module: "模块一 基础知识", chapter: "第一章 职业道德和劳动保护", title: "职业道德和劳动保护 1", url: "https://txv3.aaej.cn/a49e69d0456671ee80014531949c0102/00d21ed784ff46b5ae404dfa3fb01ab2-0ceec75918c8b0e0e8c25758b6c2fab7-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第一章 职业道德和劳动保护", title: "职业道德和劳动保护 2", url: "https://txv3.aaej.cn/a4a3c100456671eeb0414531959c0102/9a8842d6e919492abb44c91f8a80e8b0-2cf79276c6ae81207f3938cf29354e83-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第一章 职业道德和劳动保护", title: "职业道德和劳动保护 3", url: "https://txv3.aaej.cn/a4a372e0456671ee80030674a2ce0102/82a85b7b42474668845352b0b40f9f4c-388d34d6880d5ed1175d967731b8b311-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第一章 职业道德和劳动保护", title: "职业道德和劳动保护 4", url: "https://txv3.aaej.cn/a4a0dad0456671eebfb44531959d0102/5e1ce114d0924effadd637d26f96a3d2-07a0b0e5fe43087fcdd1e29c39ea38ef-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第二章 法律法规", title: "法律法规 1", url: "https://txv3.aaej.cn/a4a1ec40456671eebffd0764b3ec0102/290336d624a3471684df4e46aa8303ca-4ef57897129b325e5b6f20defc4884df-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第二章 法律法规", title: "法律法规 2", url: "https://txv3.aaej.cn/d8e98f30456671eebfb44531959d0102/fcc727997982493b8fa99848150a3dae-2a2ca623672f21776d4c5665d1abce53-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第二章 法律法规", title: "法律法规 3", url: "https://txv3.aaej.cn/920ee8b0456871ee91670764a0ec0102/9681198dbd864abaa446ed443194f382-f80e76989577df098c147ed731580de3-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第二章 法律法规", title: "法律法规 4", url: "https://txv3.aaej.cn/93035ad0456871eebfaf5420848d0102/812233e2409640d786aea548380d84c4-cda95acabc28213e0476e4507b4fc08e-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 1", url: "https://txv3.aaej.cn/95240600456a71ee80030674a2ce0102/57f834f9a75a4fe999e0f5f97a89a512-bacad8b9d84ab0ca81dfae26704b7071-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 2", url: "https://txv3.aaej.cn/952390d0456a71eebffd5107e0c90102/d25d2828993348a49ab91e5a89eeb59b-c62b57e8fb9b72fcb3f868e7dfe206d2-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 3", url: "https://txv3.aaej.cn/95247b30456a71ee80030674a2ce0102/093b160f31f74d39b91cba8e350968eb-c4bc1624d0c57b39b886cd38c76614c3-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 4", url: "https://txv3.aaej.cn/98ef05d0456c71eebf9f0764a0fd0102/4014db7dc90441c1802cb82b5e4a7181-d9d089382d6036d7395d46efe58a5116-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第三章 危险货物分类", title: "危险货物分类 5", url: "https://txv3.aaej.cn/d1402310456c71eebf925420848c0102/92ef59664d3d42e9a9eb80c6f241989a-1227a1522517982435914d5bfabfbe67-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第四章 品名及运输索引", title: "品名及运输索引 1", url: "https://txv3.aaej.cn/f23ab6b0456d71eebfa76723b78e0102/3c24077bcf3348158dd8f8fa2c197063-70ef48033a9d2bfcf31f866c1d9d46ff-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第四章 品名及运输索引", title: "品名及运输索引 2", url: "https://txv3.aaej.cn/930333c0456871ee81055017e1f90102/88b94a78a19b4c3199713261c1b57e47-6d6657692ba35de285524ca8a99b94b8-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第四章 品名及运输索引", title: "品名及运输索引 3", url: "https://txv3.aaej.cn/92ff3c20456871eebf886733a68f0102/ff90ccaaa2e64b3fbf452a633304b89e-63a669699434c84bec5940212cb082d7-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第五章 包装常识", title: "包装常识 1", url: "https://txv3.aaej.cn/f23deb00456d71ee80014531949c0102/f8b979f5e2cc46f6b60de614be1e2867-e0f4d167d7b363503f303d4faf4fe2d6-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第五章 包装常识", title: "包装常识 2", url: "https://txv3.aaej.cn/f2503a80456d71eebf9a4531858c0102/33bee992c50c4e509d6ab136b5dc6038-3501f0e54e5e88e046c83eb7198ab03f-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第五章 包装常识", title: "包装常识 3", url: "https://txv3.aaej.cn/f250d6c0456d71ee80030674a2ce0102/fd6f6a10294240788bbb4b37e6fc6272-c4d285bf6524e25d7ce8950788872227-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第五章 包装常识", title: "包装常识 4", url: "https://txv3.aaej.cn/92fa3310456871eeb8177035d0b20102/48acaa83d49f4f04bc4d663a6a2c9d8d-5c0cbe9105e1d2941c48626be63cb806-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第六章 托运要求", title: "托运要求 1", url: "https://txv3.aaej.cn/4fdec530456f71eead1c4531948c0102/f70e4528a95245fabff63d1600699a80-c8b46a45895f70c4e2bd419c60d462c7-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第六章 托运要求", title: "托运要求 2", url: "https://txv3.aaej.cn/4fca2bc0456f71eebffd0764b3ec0102/00f700618f9b4ee6b07d22205c839fb7-7e62674567023139e69c470a67b058c8-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第六章 托运要求", title: "托运要求 3", url: "https://txv3.aaej.cn/4fdb1bb0456f71ee912d5017f1e80102/e5bfdf0942f6439bb707e39d61a61e1d-42dbbfb36f6031a00ba69eb1068bb8cd-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第七章 装卸", title: "装卸 1", url: "https://txv3.aaej.cn/3ba47510458371ee81075017e1f90102/882607ed21e84330af4fd69a7886c71a-e4ba69332482001114ad1d5140c99b5d-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第七章 装卸", title: "装卸 2", url: "https://txv3.aaej.cn/3baf98a0458371eeb8187035d0b20102/7c32d41b100a4ba7a40571808d2d75aa-409ef0ca6153cdd191c53c98f3aeb236-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第七章 装卸", title: "装卸 3", url: "https://txv3.aaej.cn/3ba363a0458371eebd706723a78f0102/650e4f16f3cf4e74bab224552ae33f5c-1199fcb81bbe86f8dddccddb6701840b-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 1", url: "https://txv3.aaej.cn/95220a30456a71eebfd56733a78e0102/6311aa4e559b4064b3edfb7d52a572e1-60942e7ec18579b10892a4e008380918-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 2", url: "https://txv3.aaej.cn/95253e80456a71ee81464531958c0102/b7217b49452348a58f094319c50e82d4-ea76e0d2b84362e6f51bf012ea5c48aa-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 3", url: "https://txv3.aaej.cn/15d3a9a0457471ee91670764a0ec0102/4eda22c791b54891bf014608e6907975-68be50d3281aff30ee5663b76df0f93a-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 4", url: "https://txv3.aaej.cn/16bde290457471eeb0414531959c0102/2cf2384747564b81b9b5b7503b8bfc29-47f99ec11bf9cc07f4373dc23dc33e9a-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第八章 作业", title: "作业 5", url: "https://txv3.aaej.cn/16bfb750457471ee80890764a3fd0102/d0e1ede1a9dd4c94aedb0aa51dab7977-b018e691f01533d37ea7f35935ddc06a-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 1", url: "https://txv3.aaej.cn/4fde28f0456f71eebfaf5420848d0102/5816b3236c0540a780b2488f69c16357-d88aaa99f4e56958e8fca2b025c27942-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 2", url: "https://txv3.aaej.cn/4fdb42c0456f71ee92266732b68f0102/8cf9c1ed1c014d5092eddb42812200b6-ace74d9ed926ac5c16d8c12a08bda348-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 3", url: "https://txv3.aaej.cn/0a258be0457f71ee91670764a0ec0102/414809ae33ae4312ba259719462ec4e7-68dfce360397a7966716cd7493ac4e26-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 4", url: "https://txv3.aaej.cn/1a28c000458171ee91670764a0ec0102/70b0d56a11934dcfb6675349a621754e-aba16f3c78dd31c212ddac3dd6a15e27-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第九章 应急处置", title: "应急处置 5", url: "https://txv3.aaej.cn/85086040460a71eebfd45017f1f80102/295837a0dc3543f7bacec384b860af7a-c2eb501a8cb660b57ea95a1163bdd779-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第十章 事故案例", title: "事故案例 1", url: "https://txv3.aaej.cn/9244b1d0458071eebf9b4531858c0102/fdfd5ba9e72c4b80ba114ade81bb57bf-7ac64b52e56be8ccc2d888684874d397-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第十章 事故案例", title: "事故案例 2", url: "https://txv3.aaej.cn/54717210458271eebd706723a78f0102/a6e8dc17fc674386b2b722308d09053c-7d1df2ac0aafe167bcb297f51ef949f5-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第十章 事故案例", title: "事故案例 3", url: "https://txv3.aaej.cn/548659a0458271ee81075017e1f90102/054a1da245dd41099730a60c8250a184-a0e0bcedc6946df04735e2cd95790d70-fd.mp4" },
+            { module: "模块一 基础知识", chapter: "第十章 事故案例", title: "事故案例 4", url: "https://txv3.aaej.cn/12058e90460c71eead204531948c0102/c59257eb3ed344c999e54e17b41fb51d-a38c704e6daf3f4bca574b47a1acc893-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第一章 押运管理", title: "押运管理 1", url: "https://txv3.aaej.cn/1b11e780458171ee80890764a3fd0102/695dfb0ead664128a816e79ae7e2d4c8-596c24094dc0087af59302ba1ceb25d0-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第一章 押运管理", title: "押运管理 2", url: "https://txv3.aaej.cn/1b0febb0458171eeb91c6732b78e0102/d394fd87d0b84bbc8d3b66dd457a7cfb-33e9ecb076f2f7da88cb2142a5badb6c-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第一章 押运管理", title: "押运管理 3", url: "https://txv3.aaej.cn/1b136e20458171eead1f4531948c0102/beb9d7ddc8194c2691454a6565a96e54-a0830f117ead90bd7e58d3d699d1199c-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第一章 押运管理", title: "押运管理 4", url: "https://txv3.aaej.cn/1b136e20458171eebfb44531959d0102/ec6fcf3cd502462fbe4baa287531289a-dbc379818afa5e19978386e9b79af5fd-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第二章 安全状态检视", title: "安全状态检视 1", url: "https://txv3.aaej.cn/fd654dc0457c71ee8e875017f0f80102/9c15e533c4b8449bb44acfac8ee797a9-322c2f248f0dac6772a1a446134c7bd6-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第二章 安全状态检视", title: "安全状态检视 2", url: "https://txv3.aaej.cn/fd5f5a50457c71eebfd35017f1f80102/fb254376e0e3493eaf77a1fd73efbda2-a860a53e21b4f63a700f9794f46180e3-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第二章 安全状态检视", title: "安全状态检视 3", url: "https://txv3.aaej.cn/fd707150457c71ee800c5017f0e80102/58802b6e5fb94a9b95f666d6e708452e-75cc579dc0f69829f4f8250061e06ba7-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第二章 安全状态检视", title: "安全状态检视 4", url: "https://txv3.aaej.cn/cdb43c30457771ee80014531949c0102/b537eb0bc9654897942c454dfeacf142-ecb933b5be34376c09eafa5ac733116f-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第二章 安全状态检视", title: "安全状态检视 5", url: "https://txv3.aaej.cn/f78fb840457771eebfa85017f1e90102/e2bc1556e42d4d4eba5ce3d3f36ed962-ccb0a8a547f275bda5ca102a2409f32a-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第二章 安全状态检视", title: "安全状态检视 6", url: "https://txv3.aaej.cn/365d63f0457e71eebffd0764b3ec0102/52a4028bef5e42c79084e8f5d305aad1-5f9a92985524699fc94681facfe98c44-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第三章 停车监护", title: "停车监护 1", url: "https://txv3.aaej.cn/0b07d590457f71eebfce5017f0f90102/a06fbfb87a444e6c806bf8b1cdd3db70-de4f415584567204018651001fdb7983-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第三章 停车监护", title: "停车监护 2", url: "https://txv3.aaej.cn/0b0898e0457f71eebf925420848c0102/f8aeed2c56c7436ebc78b439cb2c7d0d-207e3dad64008350b806ee97ddaf01cf-fd.mp4" },
+            { module: "模块三 押运专业知识", chapter: "第三章 停车监护", title: "停车监护 3", url: "https://txv3.aaej.cn/54728380458271eeb0414531959c0102/807902d635a54597bc5d969cbf2116c4-40702549c269b2c650e6993010f4dfdc-fd.mp4" }
+        ],
+
+        // ---------- 客运驾驶员 ----------
+        passenger: [
+            { module: "客运第一部分", chapter: "驾驶员的社会责任、职业道德和职业心理", title: "驾驶员的社会责任、职业道德和职业心理 1", url: "https://txv3.aaej.cn/78fa681b0e6b40c0848862a98139f121/65b0cb7eb0ad4abda299164f75d0a44f-395ca28e05536b7b2f1f317fcbe4faf8-fd.mp4" },
+            { module: "客运第一部分", chapter: "驾驶员的社会责任、职业道德和职业心理", title: "驾驶员的社会责任、职业道德和职业心理 2", url: "https://txv3.aaej.cn/e895ac837ab34203a277eb107cff03a8/cbdfa484a51746c2b897b42d9c0333ee-17e8b31157f640851b4c0538d7c9aa14-fd.mp4" },
+            { module: "客运第一部分", chapter: "驾驶员的社会责任、职业道德和职业心理", title: "驾驶员的社会责任、职业道德和职业心理 3", url: "https://txv3.aaej.cn/c254fcf1c56249b2a272613a662121ce/ae2333af16fb4c508e1dd487706ccb09-325a65ccc073c8683eff8fb665c07292-fd.mp4" },
+            { module: "客运第二部分", chapter: "道路运输从业相关法律、法规", title: "道路运输从业相关法律、法规 1", url: "https://txv3.aaej.cn/d9628257a4d448d19e7326e185b8c176/74e770d87fa24928b881974c28426dc4-8d63c2b477cd1159294c815868a47edf-fd.mp4" },
+            { module: "客运第二部分", chapter: "道路运输从业相关法律、法规", title: "道路运输从业相关法律、法规 2", url: "https://txv3.aaej.cn/d6462150cc6d4186b1084d56e776b884/aa411fa56e2b4b23bb3f90b5a02d0031-0939381f78eaf385f494304daed417ed-fd.mp4" },
+            { module: "客运第二部分", chapter: "道路运输从业相关法律、法规", title: "道路运输从业相关法律、法规 3", url: "https://txv3.aaej.cn/0415dc186bce4ced9b1668ff2ebffc9b/2c91d64a31cb46478ecbc8cecf6288cb-5a64a653cd650d001bd978dc83cb5b3b-fd.mp4" },
+            { module: "客运第二部分", chapter: "道路运输从业相关法律、法规", title: "道路运输从业相关法律、法规 4", url: "https://txv3.aaej.cn/d74fedfadbeb4a7e9356942fc8a0c1e5/c50a72815fe64eddb248fcb6aa0d39b7-69206f1f618a950de5f6dff67d8963dc-fd.mp4" },
+            { module: "客运第二部分", chapter: "道路运输从业相关法律、法规", title: "道路运输从业相关法律、法规 5", url: "https://txv3.aaej.cn/a26d8360943b4df6a89545fadc70a2c8/fe2e2200c02044e0b007399a02441776-5b733486769abf66a509fc56f48fd95b-fd.mp4" },
+            { module: "客运第二部分", chapter: "道路运输从业相关法律、法规", title: "道路运输从业相关法律、法规 6", url: "https://txv3.aaej.cn/c4be6d17bc7546f8b57185162c507ac3/3dc29d6a6a8b4f4d89896af89cad6eff-7d77cb8353ff5953c766e42218fce37e-fd.mp4" },
+            { module: "客运第二部分", chapter: "道路运输从业相关法律、法规", title: "道路运输从业相关法律、法规 7", url: "https://txv3.aaej.cn/4e961865b1bd44f2ae78031a3d7b21f9/97bc3120d1fa484e91219c4e53ad2d3a-082a5c9aaf0f789bfa654083d2f61bdb-fd.mp4" },
+            { module: "客运第三部分", chapter: "道路旅客运输知识", title: "道路旅客运输知识 1", url: "https://txv3.aaej.cn/9d992f7c3b034b07b51c5cde2ca8098e/007ff787af7d4bc1bcf8de3035c12220-b077d0ba522bc4505e0538bccdf7aad0-fd.mp4" },
+            { module: "客运第三部分", chapter: "道路旅客运输知识", title: "道路旅客运输知识 2", url: "https://txv3.aaej.cn/e051e0c246254991a8e57bc3682dd518/d84eee4b5d354547a6b8a27b074da848-ade42837baf67ae3b313868feb386dad-fd.mp4" },
+            { module: "客运第三部分", chapter: "道路旅客运输知识", title: "道路旅客运输知识 3", url: "https://txv3.aaej.cn/4ac2d58a52464ed093cae4d95447c69e/3d330ec1655b4405afb42429748a9c9e-e5f59767c82ada2820cc70ae9bece7d8-fd.mp4" },
+            { module: "客运第三部分", chapter: "道路旅客运输知识", title: "道路旅客运输知识 4", url: "https://txv3.aaej.cn/72b8e5dcf1034404a7c3ddf29b989a48/d37019285cdc49c088ae2521b6a3b643-ee0427fc17399a035f9bf530e85268cd-fd.mp4" },
+            { module: "客运第三部分", chapter: "道路旅客运输知识", title: "道路旅客运输知识 5", url: "https://txv3.aaej.cn/aa61e0eb0e94444792d0749b1ca3439c/5c495be8b4f8483b8fa76ddc778d894f-251ade76ab1adf606c9af08df025ec2b-fd.mp4" },
+            { module: "客运第三部分", chapter: "道路旅客运输知识", title: "道路旅客运输知识 6", url: "https://txv3.aaej.cn/f966a013153c4cb487a915336953e170/51af9056f0f843aa855548f1ec0618cf-cf369e9db1e69299ac66abfbaaf8f109-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 1", url: "https://txv3.aaej.cn/49cf290275144b749792c8cf5fa7ef93/bd410881b4de4c9caec01b1940922ff5-276885bc2bb322d3e8a6bcf2323aa4e7-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 2", url: "https://txv3.aaej.cn/945b9091386f4df592125e75ceafec1a/aa53f9b912a2423986098a234ea598a7-d0ad587e5df9efeefae56f22b67bc18e-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 3", url: "https://txv3.aaej.cn/89e8543f2de242e99b21419dd3cfbc5e/cdd921d4236b411a8ca741f7ae834673-4ae5779a36364d3d7897711871823367-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 4", url: "https://txv3.aaej.cn/b2d72c96a4604ec09a034f0b07a1ce4c/59dee2313887445c878ab47e7a6b26fd-a88d14b54e25057c5f1b071ebd858557-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 5", url: "https://txv3.aaej.cn/244abdb72b0d4a63b272872f8bca2873/c9319fd833ab429eb471c4d6180f3e00-967ed7500d641cc49b1398c311ee01f9-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 6", url: "https://txv3.aaej.cn/c5b1a8d6aa6a4a1e9c9222767d9a4922/cac37521556942278e35c8fc190ae0ec-ccdc2fc4b905e6f753d910baf9af446d-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 7", url: "https://txv3.aaej.cn/fbd10fce98c24e9eb515bca947d919b2/7f7e930834114d0a90f86a8398e31aa4-ff2005b53970a34560ad68bf8363edec-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 8", url: "https://txv3.aaej.cn/84666b4aaca74ca99a0ca9e88fa9d2ea/c4f3e526c5134e4997bc23081b306cd4-2c61cedd8ae3f49e8d90a180735c5c7e-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 9", url: "https://txv3.aaej.cn/87275210925b4999a926d8ed9ab339fa/02409ee07b5240eaa943192b3ea40d11-57d0cb8b9d497f86c00f73f256c1f958-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 10", url: "https://txv3.aaej.cn/a3829eedd6c84589942810665c21c77b/df5d8228a6b84e2792d12497ea8ee371-4bc6d464e5e3a10bde515f29477f2d69-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 11", url: "https://txv3.aaej.cn/311e05e7307b49aa8c0e99bdf6ce5ded/749719d6e98044f2851cfe53d02b55e8-6a091a79d566becd2b443fdfa0350f58-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 12", url: "https://txv3.aaej.cn/6b0c5d8a59154d5691d8687b34843bba/2cb6e1cd9a6e4dbb8e531ebf878fa48b-fcfebb88bb5242f28578c24f73e76ae3-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 13", url: "https://txv3.aaej.cn/f4f764b3d1324516a6b03914793582a3/43ea4d4e63af4be7a4c9ca983a94b119-aeaddc41cab353b7f9ae59b6336267aa-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 14", url: "https://txv3.aaej.cn/639b57cfb07348f9a0213aa55b508f49/b17bcc3934554522b678bf863664cab5-b13ac0eaa41c857770f1c03225164029-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 15", url: "https://txv3.aaej.cn/72bd4853142840b19b0b035ae0f4f754/95eb126c8eac497e96f18249d9e6f94b-5e95eaec1da0bf429499846ed1cd4e07-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 16", url: "https://txv3.aaej.cn/44c77feae57444318da7486c2ea319ea/6dd6c8e783b54e84a0c6351db663b700-038f15ca601210db582f27c7ad005133-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 17", url: "https://txv3.aaej.cn/ebd41bf9af67423aa247cba84fc579a1/f1fed43726c9437db1c4f5b870812c2d-53d9a47d3696d3af3db431d7a8950b0f-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 18", url: "https://txv3.aaej.cn/e02bece59fca4c1d88218927564b7e7e/33731510607a4103a97a6f5ba21df613-95a05e70521c14caf41becf3541a4c05-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 19", url: "https://txv3.aaej.cn/8fc42d40745748ceb5f313793eeda6bc/db2a86e6ac3c4d2cb6b7880d41727049-d9dbb852f47cb84056856b2355ef0d28-fd.mp4" },
+            { module: "客运第四部分", chapter: "安全意识与行车安全", title: "安全意识与行车安全 20", url: "https://txv3.aaej.cn/96f06c040a1e456eb4b66141a0c2ae4b/829cd3a771ce4d4daf050f2f3cfe0ec8-cb2442473c7f37832b6874e1e97afe2a-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 1", url: "https://txv3.aaej.cn/00bfe782dfe94a459c07eeaea8150b9c/ef07bce35d28428aa863e3fdf9a09856-1f0e13adc04c874c4c50580158ac756c-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 2", url: "https://txv3.aaej.cn/cdf53d889a304741884f9d0c544fc7c3/8f63af9bafea4b1bb2790eab2cbc80f4-d1aa0399f22619cc9d944fad7dfd63cb-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 3", url: "https://txv3.aaej.cn/dca55b5fe26a4038b3e8f3184818e1d1/3af3809de7414c81a36e348291f0732b-baafac86ea765e6d90e7b92e8efeb4ff-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 4", url: "https://txv3.aaej.cn/fde17636df72425585d36dac3d498853/70d28825a48446d5878014eb8305700e-ac31961f18ec748c79ef1c22c39f3d38-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 5", url: "https://txv3.aaej.cn/210dcce53d0b4a7e85e24cfa8aeed0f0/5a7dfc8a5ca440d9af5412df22adda01-12e2ef7ccf21270feb144e9205833ad1-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 6", url: "https://txv3.aaej.cn/f7ad62a1f5964c75af22e83ec95acfaf/bcd297aad1b341fab72858aaad48e020-6f645f1343fe5e7a75b35003d0b03a06-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 7", url: "https://txv3.aaej.cn/b403300892c441b484a800ea768b7b69/b8379ac68a35481884118b24936f3364-f2c76411e711aff3e14e623c871cb548-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 8", url: "https://txv3.aaej.cn/16a1efd1bde24c2daac3a8796aaa5244/e8ea6b7c9ed442998f992358fab18c59-cf26c0bbae793dc9c2b70d2a21a9013e-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 9", url: "https://txv3.aaej.cn/c436dc6bc9444195ba620addd26a44ff/56a4d82a41034ecb8015dabe97322e89-b784f3411610addeb6d63c917e45ea82-fd.mp4" },
+            { module: "客运第五部分", chapter: "汽车使用技术", title: "汽车使用技术 10", url: "https://txv3.aaej.cn/1d1dd9913a974d27aec6ce8611f4980c/fe3a08da40e04ba487b2dfdec3d2d289-9e7e58a2f041a6de252cce0dc48d2fc4-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 1", url: "https://txv3.aaej.cn/5954f0e6e1b642099256aa6c973c9887/0f64b38aa3b345e1b8d6a9eb90aab1cd-c04f23d192123a4003eb2d06084cbc5e-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 2", url: "https://txv3.aaej.cn/558ce61676a74e4499c402a49f503762/cc745a690d9c46dda00aa586a494fa71-1cb33029550acb222d07b15460013466-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 3", url: "https://txv3.aaej.cn/329868053b9e4e88a5bbb6762b8d7a76/9db0bbca3d5b4d338361b87c9d28291a-2b46956673925989e344ed1d0036a1d8-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 4", url: "https://txv3.aaej.cn/1c13ddeefd53449ea97a11a5405dc403/650acf761f154a779e9756ad36f7841a-e15de176e6ebc307961d4cf7c6b6abd9-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 5", url: "https://txv3.aaej.cn/2841e8857c1f4b9ca15abd22776b61b3/4ccf7d4e09054d08815036e6b6071571-a8a4334dbee5c10f37a61ce5efe049d4-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 6", url: "https://txv3.aaej.cn/8fb5196d738344edb00c728b3fc06fd8/d877041440b54879905c968ae5803921-3e5bec9a9c2f11e682dbbc95cc336e5a-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 7", url: "https://txv3.aaej.cn/38d4b5eedb4f4bbcb394dfbb93e0b872/3135620eab264ea4a159c41d946e3367-2cd7d7a006fe81e648b2c968f345a0d5-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 8", url: "https://txv3.aaej.cn/e2372df5cdf046c6aa67fcb688d4a8c8/c0e20b3064d74a5b8d0f5d789c615e5c-7d53e60d548f82fcb0c5f690bc4135ca-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 9", url: "https://txv3.aaej.cn/3563895439f346aa91d144894c2fb3f2/fd77431d521542518afaa7498d4abddd-82e56a52c9d6e844eeca9abda3a5c815-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 10", url: "https://txv3.aaej.cn/0df56c71b82944b59a0e88b06fbe83f7/ae9a34e2f9d84f1eb336e9266ca49824-896043c11b585723bf90eb65bedd9c82-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 11", url: "https://txv3.aaej.cn/50934027c083433da3748dec2fdedf6e/69a54cccee1b4ced872a797f85cb138f-fb5b63381e7d48f9c633358b08e67d93-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 12", url: "https://txv3.aaej.cn/a30e8c3b83f143e1903d87e5e8f8c405/e728f82f1a7b49cb8cf378f725e2d2af-0c7ce11d27086d1a9b310fe836d6fc66-fd.mp4" },
+            { module: "客运第六部分", chapter: "应用能力", title: "应用能力 13", url: "https://txv3.aaej.cn/9bb6cb719a544ea994034b1b3b4d85da/bb2cda48958d40bdb7d056cf8eeb5ffe-7f735d33590dcfbcda23b3a89cb22fa4-fd.mp4" },
+            { module: "客运复习题", chapter: "复习题", title: "第一部分：社会责任职业道德复习题", url: "https://txv3.aaej.cn/5154198c178f437ea23e24f192cf8289/258a349a4ef4467facc42cbac0b2afc5-ff23a7bbd9f8762ebe50247931eaa112-fd.mp4" },
+            { module: "客运复习题", chapter: "复习题", title: "第二部分：道路运输相关法律复习题", url: "https://txv3.aaej.cn/5065883c5fad45f6b59db49eefee8324/2b821f272e0d423aba62231b7aa74589-0bc2ce28cf79d110f56ad03639530ddc-fd.mp4" },
+            { module: "客运复习题", chapter: "复习题", title: "第三部分：旅客运输知识复习题", url: "https://txv3.aaej.cn/daabeb8d6cda4e7e9f732f16003d9045/0d8922f7b8d24d43b4e189b977ef3d7a-1d517d6c42fdade03e30d93a782bec66-fd.mp4" },
+            { module: "客运复习题", chapter: "复习题", title: "第四部分：安全意识与安全行车复习题", url: "https://txv3.aaej.cn/8174d01784d44a32bfe37c7961603ef3/e2a0995d84bb4078a835d8f8e218edad-6213d90cbb0f6c693fd795f39dabe6c5-fd.mp4" },
+            { module: "客运复习题", chapter: "复习题", title: "第五部分：汽车使用技术复习题", url: "https://txv3.aaej.cn/9f4fbc2b0d964402b37f0296b6ee0837/93c948709ee549fe9442b04d781712ec-fe393787aa4143fd1ec50d1b93a57111-fd.mp4" },
+            { module: "客运复习题", chapter: "复习题", title: "第六部分：应用能力复习题", url: "https://txv3.aaej.cn/74e971366f774464993d5b202222b975/27296fa1364e4b3e98e55b42a5b836c3-d54606925a17717b331b8b8f213c3a0b-fd.mp4" }
+        ],
+
+        // ---------- 出租车/网约车驾驶员 ----------
+        taxi: [
+            { module: "1.职业基本知识", chapter: "职业基本知识", title: "职业基本知识 1", url: "https://txv3.aaej.cn/2163cf39d6564def9c93ade0621f8004/225bdc8b7fbf46ffa5ed7ae88059a89e-97ee2daa30191acdbb88ac6564ff4ab6-fd.mp4" },
+            { module: "1.职业基本知识", chapter: "职业基本知识", title: "职业基本知识 2", url: "https://txv3.aaej.cn/7b1e190fd24f44af9ed6aa290cc46b3a/172723a085a04afe840b5c18ee973241-6126603a4a9684e84079267b6301141a-fd.mp4" },
+            { module: "1.职业基本知识", chapter: "职业基本知识", title: "职业基本知识 3", url: "https://txv3.aaej.cn/0abb13272df344a2906f221de6aa7dfe/05f0a7e20666478bb753ac94d1ec03c6-34a0c4767c9f2d78fb58f92bad3db61d-fd.mp4" },
+            { module: "1.职业基本知识", chapter: "职业基本知识", title: "职业基本知识 4", url: "https://txv3.aaej.cn/d75fbe9036e04ecdb96242847ccebc03/ff62c2bda51e43c28477afec1b450676-e9c9283099bd5d2d2051bc00cbc12769-fd.mp4" },
+            { module: "1.职业基本知识", chapter: "职业基本知识", title: "职业基本知识 5 复习题", url: "https://txv3.aaej.cn/ba5fa2cf51c546bc86b8f920ae9020fd/9aabdfe9d0de45d6802663efe5644b52-e9c7c44f6605eb5b24cef784df20384a-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 1", url: "https://txv3.aaej.cn/4dff714584c84541aed211e8106a07aa/388d5511f9644339941efbb5ffdf7149-6b2f6b71b44fddaabbce7d0e312453a1-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 2", url: "https://txv3.aaej.cn/83467539ff884927934d3265f5e8e532/b539d2c96b29477991746a6db1f07604-106b75d46e924844531a0bfa51d4655d-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 3", url: "https://txv3.aaej.cn/1806043fdef04da8aabcaf6bcc0c3303/15914475c8814bc79e87103cb233de3e-506780a630f03b5a5d11168f5de29982-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 4", url: "https://txv3.aaej.cn/3cd168b88afe4227bda2ac356f1fa8b0/5ef59116fa8a461db9985515d40c54c5-9fe0ea0cfb3a59e8bba518ac7eb25e02-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 5", url: "https://txv3.aaej.cn/96d452f7b7a74043b52e4435485894d4/727bb2b621174ff483b438f557c8111a-4d7ea06212c28001245514e68fcebf19-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 6", url: "https://txv3.aaej.cn/87720b7edd21464a874cf52e3d08827d/d7dc71c1f2c94ebca335384a81d3ab16-c512f1fc3fd74d1e94f984e061b611f1-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 7", url: "https://txv3.aaej.cn/b2c3a50a3d5d4432a4f301169004e66c/064aa0e346244f2486cac05c5f8359c7-3069822722e6007853ab73dd98fee047-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 8", url: "https://txv3.aaej.cn/694ce662724d4cb0948b5cc29a539ddd/c1fc767b6d3e42318708d364dc36b91a-a1cbbe007a87f54df9ea5532cf89c00f-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 9", url: "https://txv3.aaej.cn/230cee4ffaa64f2dbc7b910ff5cfe71c/6a3dfd8df2624cdb800af5e29c4527c5-3fb57846b096436695c5e046d1125509-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 10", url: "https://txv3.aaej.cn/05cd2dde167c445daf5481b645e975c4/2771ad95c8694b90ac42c860a197598f-dbf0f24d61a2c149b4aa8bdebd681209-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 11", url: "https://txv3.aaej.cn/a8b6812e3c8b4e7b897b25e0cbcef44f/b2d0c02eb10a490cb166399a45dfb111-a68089d99c19f00a2544ac43bd1da71b-fd.mp4" },
+            { module: "2.法律法规知识", chapter: "法律法规知识", title: "法律法规知识 12 复习题", url: "https://txv3.aaej.cn/72e645359cca4397994e4146628184ad/9488a6d7503f4004a278f1450aedd5d4-ce0caad70361108934231c40c1d6f3ff-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 1", url: "https://txv3.aaej.cn/4486378efb5f418799e37dff4fcec559/14a2bbab4233405991284199f202a2ca-0a0b5f577ec7e7baa9139b4696caf0cf-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 2", url: "https://txv3.aaej.cn/dba747e066f345b0b34b620b8f5a2b88/5c26c7c5d9ad4c8b9a93635583215468-ed5569d6a4414de6244a3d2aa0538f80-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 3", url: "https://txv3.aaej.cn/48a0a160cf704046bcd7696c1c6effc6/7b69b2c1e8f945519b985a5a81e9e025-441e3c869807128a00bb92d62714551b-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 4", url: "https://txv3.aaej.cn/c5e4c12e575a4c94b41d50506ba1dcc5/90e60258bd2043a2a50eea5115f79a77-d88825159df61e4bb48d67402fa706f3-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 5", url: "https://txv3.aaej.cn/b4a0a01dff544523819643f1aeeaaae7/80eebf5ce0754acc890e8e1f2cc92a18-74a5cc3802df93dddb6119942e0e60c7-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 6", url: "https://txv3.aaej.cn/f287533e973f4e1b8fb4c9d8d3a55c52/c6eea81463344b418c7cc204c46e1a87-d09d1cf3436afe5a4dae4b06c53cc508-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 7", url: "https://txv3.aaej.cn/856382a8856e4116870512c354bef15d/564aa530b8a84653842f7a1626ecf39d-633a5fe8d39bdb6e216d11c4b74d5496-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 8", url: "https://txv3.aaej.cn/c909147e0dae424d8feb45b777dd71d9/a0adb7680124455fbb7c4899cbdfe364-4006d5c156855ee36f38ad2cf53936ab-fd.mp4" },
+            { module: "3.服务规范知识", chapter: "服务规范知识", title: "服务规范知识 9 复习题", url: "https://txv3.aaej.cn/f9be7e0ad4fe41709026f0d7342e5524/6e2429bfe56149c8839f0e74d9c4b1a0-15d356a07f6279ceca22a32a21bfa79a-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 1", url: "https://txv3.aaej.cn/09abb8d42df641f092f4ce714c803da1/e25464e38fbe4ad2a702a4ee384150fa-cf808a2a5235d8904e13fd90f2cf362d-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 2", url: "https://txv3.aaej.cn/172cc845d39f4bb78dfc31ce346ecda2/589ef1d8c28e4f899bbe6dd58e87212a-8f34d3487ce444da0902e3261b1ee8b0-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 3", url: "https://txv3.aaej.cn/9265e92f7b00432ea0f5e23519954e92/68d215e5b4de4acb91517bef865aa741-5753bf2964253c5ab5e475f668bafa65-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 4", url: "https://txv3.aaej.cn/3773a101895e4e68ad9bd134872385b7/e5b5044a6a6447c6a43491d1dcc18e65-b1556b79d00403fa05d00a9a2c8fd85a-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 5", url: "https://txv3.aaej.cn/b9865f22ea784d71a0dad521345d22b6/a05a7119749c473288a34cd15d1cea58-9c78126a7329cb1f517190111761efc2-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 6", url: "https://txv3.aaej.cn/4d761c831000411aa6d3159c1de475a9/1bba6249c2784c7ea0b3f363c7e93a09-2931e5dd9d5dbf42a03edafbd6425104-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 7", url: "https://txv3.aaej.cn/3be8c650c36a43ec83f58d21121c2e4c/60c6dba10d714db9b210ce9fbf08abfd-fb153720762cdaa4a0db210bcf34f411-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 8", url: "https://txv3.aaej.cn/259f6e42f4524c458c11dbdd0b3ff51d/17c82bfb537f4d438093f1462d1fab3b-a40b66db8662d1bc3bf1d26cdd363390-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 9", url: "https://txv3.aaej.cn/4acab2ceea984c0eb3dc48cf5581d6aa/026786971ad9419484f55f401a327389-031f9e80e81167206c9974a28c5b01e3-fd.mp4" },
+            { module: "4.安全营运知识", chapter: "安全营运知识", title: "安全营运知识 10 复习题", url: "https://txv3.aaej.cn/fcdd7a736a0948038f5739f0bd1b3258/edd8d1e386004f8386052fde4018a44b-68f3a82f623d4a8606e6e74f42a16dfd-fd.mp4" },
+            { module: "5.汽车使用与故障处理知识", chapter: "汽车使用与故障处理知识", title: "汽车使用与故障处理知识 1", url: "https://txv3.aaej.cn/fb1df565f86e402d834dbc5a6da3931d/f90193d8c86e452aab115af71e59078f-3f37469f03084ad573a483a41462ec86-fd.mp4" },
+            { module: "5.汽车使用与故障处理知识", chapter: "汽车使用与故障处理知识", title: "汽车使用与故障处理知识 2", url: "https://txv3.aaej.cn/4d65360aefd4468c8136ae044f2994b5/bad3f5abafe74f92a570e3f01c6fdf33-4e6a67bc45f4849840c34574805b51b4-fd.mp4" },
+            { module: "5.汽车使用与故障处理知识", chapter: "汽车使用与故障处理知识", title: "汽车使用与故障处理知识 3", url: "https://txv3.aaej.cn/d3c540675ed44b2b9599b70632d659bf/6567d84c586f4ed5bbb559bf372d2b00-dd0004f0178d14288260786644327bc8-fd.mp4" },
+            { module: "5.汽车使用与故障处理知识", chapter: "汽车使用与故障处理知识", title: "汽车使用与故障处理知识 4", url: "https://txv3.aaej.cn/e797f86afa43447f9423abe8460df8b3/2ca5586640f442d89dd4aec3151d476f-50267cc79ff014444ff7f1e8157fef70-fd.mp4" },
+            { module: "6.汽车节能与环保知识", chapter: "汽车节能与环保知识", title: "汽车节能与环保知识", url: "https://txv3.aaej.cn/e47f60a299fe499aa65081848032adfe/bef64c0c688c4761ae3b17017ee4eacd-df55a60a47e939b3ccf52255459da87a-fd.mp4" },
+            { module: "7.事故处理与应急救护知识", chapter: "事故处理与应急救护知识", title: "事故处理与应急救护知识 1", url: "https://txv3.aaej.cn/1beaed4be9a74f54bd699d900a3cb469/dab95874350241b08e2dd9b934d12c30-281d79cfd592d2fe308f4f76a71da9bf-fd.mp4" },
+            { module: "7.事故处理与应急救护知识", chapter: "事故处理与应急救护知识", title: "事故处理与应急救护知识 2", url: "https://txv3.aaej.cn/24235d715e81457e9d66d98f8970c92e/d0a9290f893a4360afd2729e8709cd76-00b2ef0f7ddfe0385978ddd42ae8ed03-fd.mp4" },
+            { module: "7.事故处理与应急救护知识", chapter: "事故处理与应急救护知识", title: "事故处理与应急救护知识 3", url: "https://txv3.aaej.cn/378fb78047454db58cf05ef341e9f167/af6e926fbd9b4f7a892b8212b0682fb5-b5b5051b1b9f66f8fdec17c908ef2f75-fd.mp4" },
+            { module: "7.事故处理与应急救护知识", chapter: "事故处理与应急救护知识", title: "事故处理与应急救护知识 4", url: "https://txv3.aaej.cn/02d8af0a11214d5487e7834bdc66aa3e/71682e04ca6d4c878f99287767ba0940-5652fdaaf5b789887d4330c563055b40-fd.mp4" },
+            { module: "7.事故处理与应急救护知识", chapter: "事故处理与应急救护知识", title: "事故处理与应急救护知识 5", url: "https://txv3.aaej.cn/3735313c54b7454f87b574a46cdc41a3/b361551610084b259b8a619903d227f5-2d0e0c9044ed119de86ae0bd815d0be3-fd.mp4" },
+            { module: "7.事故处理与应急救护知识", chapter: "事故处理与应急救护知识", title: "事故处理与应急救护知识 6", url: "https://txv3.aaej.cn/b44ada0608cb48ddba5ff04203914ff5/41e271585f054ad382c0dda291210370-0b9a98c1d33909c68b35d5d688684956-fd.mp4" }
+        ]
+    };
+
+    let currentCourse = "driver";
+    let currentFilter = "";
+
+    function buildTree(data) {
+        const tree = new Map();
+        data.forEach(item => {
+            if (!tree.has(item.module)) tree.set(item.module, new Map());
+            const moduleMap = tree.get(item.module);
+            if (!moduleMap.has(item.chapter)) moduleMap.set(item.chapter, []);
+            moduleMap.get(item.chapter).push(item);
+        });
+        return tree;
+    }
+
+    function playVideo(v) {
+        if (!v || !v.url) return;
+        const videoPlayer = document.getElementById('mainVideo');
+        videoPlayer.src = v.url;
+        videoPlayer.load();
+        document.getElementById('currentTitle').innerText = v.title;
+        document.getElementById('currentChapter').innerText = v.module + " · " + v.chapter;
+        document.querySelectorAll('.chapter-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll(`.chapter-item[data-url="${v.url}"]`).forEach(el => el.classList.add('active'));
+    }
+
+    function escapeHtml(s) {
+        return s.replace(/[&<>]/g, function(m) {
+            return m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;';
+        });
+    }
+
+    function renderCatalog() {
+        let data = coursesData[currentCourse];
+        if (!data) data = [];
+        document.getElementById('videoCount').innerText = data.length + '个视频';
+        const tree = buildTree(data);
+        let html = '';
+        let idx = 0;
+        for (let [mod, chMap] of tree.entries()) {
+            let chHtml = '';
+            let modVis = 0;
+            let mid = 'mod_' + idx++;
+            for (let [chap, items] of chMap.entries()) {
+                let itemHtml = '';
+                let vis = 0;
+                for (let it of items) {
+                    if (currentFilter === '' || it.title.toLowerCase().includes(currentFilter) || it.chapter.toLowerCase().includes(currentFilter) || it.module.toLowerCase().includes(currentFilter)) {
+                        vis++;
+                        itemHtml += `<div class="chapter-item" data-url="${it.url}"><span class="video-badge">▶</span><span class="video-title">${escapeHtml(it.title)}</span></div>`;
+                    }
+                }
+                if (vis > 0) {
+                    chHtml += `<div><div class="chapter-item" style="font-weight:600;background:#fafcff;cursor:default;padding-left:1.2rem;">📖 ${escapeHtml(chap)} (${vis})</div><div style="padding-left:0.5rem;">${itemHtml}</div></div>`;
+                    modVis += vis;
+                }
+            }
+            if (modVis > 0) {
+                html += `<div class="module-group"><div class="module-title collapsed" data-module-target="${mid}"><span>📁 ${escapeHtml(mod)} (${modVis})</span><span class="arrow">▼</span></div><div class="chapter-list collapsed" id="${mid}">${chHtml}</div></div>`;
+            }
+        }
+        if (html === '') html = '<div style="padding:2rem;text-align:center;">🔍 未找到相关课程</div>';
+        document.getElementById('listContainer').innerHTML = html;
+
+        document.querySelectorAll('.chapter-item[data-url]').forEach(el => {
+            el.addEventListener('click', () => {
+                let url = el.getAttribute('data-url');
+                let found = data.find(v => v.url === url);
+                if (found) playVideo(found);
+            });
+        });
+
+        document.querySelectorAll('.module-title').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let tid = btn.getAttribute('data-module-target');
+                let tar = document.getElementById(tid);
+                if (tar) {
+                    tar.classList.toggle('collapsed');
+                    btn.classList.toggle('collapsed');
+                }
+            });
+        });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        currentFilter = e.target.value.trim().toLowerCase();
+        renderCatalog();
+    });
+
+    document.getElementById('expandAllBtn').addEventListener('click', () => {
+        document.querySelectorAll('.chapter-list').forEach(el => el.classList.remove('collapsed'));
+        document.querySelectorAll('.module-title').forEach(el => el.classList.remove('collapsed'));
+    });
+
+    document.getElementById('collapseAllBtn').addEventListener('click', () => {
+        document.querySelectorAll('.chapter-list').forEach(el => el.classList.add('collapsed'));
+        document.querySelectorAll('.module-title').forEach(el => el.classList.add('collapsed'));
+    });
+
+    document.querySelectorAll('.course-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.course-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentCourse = tab.dataset.course;
+            currentFilter = '';
+            document.getElementById('searchInput').value = '';
+            renderCatalog();
+            if (coursesData[currentCourse] && coursesData[currentCourse][0]) playVideo(coursesData[currentCourse][0]);
+        });
+    });
+
+    renderCatalog();
+    if (coursesData.driver[0]) playVideo(coursesData.driver[0]);
+    document.querySelector('.course-tab[data-course="driver"]').classList.add('active');
+</script>
+</body>
+</html>
